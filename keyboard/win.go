@@ -47,14 +47,13 @@ func SendString(s string) {
 	// get keyboard layout for VkKeyScanExA
 	hkl, _, _ := getKeyboardLayoutProc.Call(uintptr(0))
 	// get caps lock state 0x14 is VK_CAPITAL
-	state, _, _ := getKeyStateProc.Call(uintptr(0x14))
+	state, _, _ := getKeyStateProc.Call(uintptr(_VK_CAPITAL))
 
 	if state&0x0001 == 0 {
 		// CapsLock is off
 		fmt.Println("CapsLock is off")
-		capsDown := NewKeyboardInput(_VK_SHIFT, 0, 0)
-		capsUp := NewKeyboardInput(_VK_SHIFT, 0, _KEYEVENTF_KEYUP)
-
+		capsDown := NewKeyboardInput(_VK_CAPITAL, 0, 0)
+		capsUp := NewKeyboardInput(_VK_CAPITAL, 0, _KEYEVENTF_KEYUP)
 		inputs = append(inputs, capsDown)
 		inputs = append(inputs, capsUp)
 	}
@@ -65,9 +64,9 @@ func SendString(s string) {
 		// var shiftState int16 = int16((vkscan >> 8) & 0xFF)
 
 		// translate VK_X to VK_NUMPADX
-		// if vkc >= 0x30 && vkc <= 0x39 {
-		// 	vkc += 0x30
-		// }
+		if vkc >= 0x30 && vkc <= 0x39 {
+			vkc += 0x30
+		}
 
 		vsc, _, _ := mapVirtualKeyExAProc.Call(vkc, uintptr(0))
 		inputDown := NewKeyboardInput(uint16(vkc), uint16(vsc), 0)
@@ -78,9 +77,8 @@ func SendString(s string) {
 	}
 
 	if state&0x0001 == 0 {
-		capsDown := NewKeyboardInput(_VK_SHIFT, 0, 0)
-		capsUp := NewKeyboardInput(_VK_SHIFT, 0, _KEYEVENTF_KEYUP)
-
+		capsDown := NewKeyboardInput(_VK_CAPITAL, 0, 0)
+		capsUp := NewKeyboardInput(_VK_CAPITAL, 0, _KEYEVENTF_KEYUP)
 		inputs = append(inputs, capsDown)
 		inputs = append(inputs, capsUp)
 	}
@@ -99,5 +97,6 @@ const (
 	_VK_SHIFT        = 0x10
 	_VK_CTRL         = 0x11
 	_VK_ALT          = 0x12
+	_VK_CAPITAL      = 0x14
 	_KEYEVENTF_KEYUP = 0x0002
 )
