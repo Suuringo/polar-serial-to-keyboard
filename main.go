@@ -1,8 +1,8 @@
 package main
 
 import (
+	_ "embed"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"polar/keyboard"
@@ -11,13 +11,8 @@ import (
 	"go.bug.st/serial"
 )
 
-func getIcon(s string) []byte {
-	b, err := ioutil.ReadFile(s)
-	if err != nil {
-		fmt.Print(err)
-	}
-	return b
-}
+//go:embed shig.ico
+var shigLove []byte
 
 func main() {
 	systray.Run(onReady, onExit)
@@ -26,7 +21,7 @@ func main() {
 
 func onReady() {
 	systray.SetTitle("UiShigureLove")
-	systray.SetIcon(getIcon("./shig.ico"))
+	systray.SetIcon(shigLove)
 	systray.SetTooltip("uisgrsuki")
 	mquit := systray.AddMenuItem("Quitter", "Quitter")
 	go func() {
