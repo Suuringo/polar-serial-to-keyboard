@@ -16,12 +16,14 @@ var (
 	sendInputProc         = user32.NewProc("SendInput")
 )
 
+// INPUT winuser.h structure
 type INPUT struct {
 	inputType uint32
 	ki        KEYBDINPUT
 	padding   uint64
 }
 
+// KEYBDINPUT winuser.h structure
 type KEYBDINPUT struct {
 	wVk         uint16
 	wScan       uint16
@@ -30,6 +32,7 @@ type KEYBDINPUT struct {
 	dwExtraInfo uint64
 }
 
+// NewKeyboardInput INPUT constructor
 func NewKeyboardInput(wVk uint16, wScan uint16, dwFlags uint32) (kbinput INPUT) {
 	kbinput.inputType = 1
 	kbinput.ki.wVk = wVk
@@ -38,6 +41,7 @@ func NewKeyboardInput(wVk uint16, wScan uint16, dwFlags uint32) (kbinput INPUT) 
 	return
 }
 
+// SendString converts string chars into virtual key codes and feeds them into SendInput system call
 func SendString(s string) {
 	var inputs []INPUT
 	// get keyboard layout for VkKeyScanExA
