@@ -79,9 +79,9 @@ func SendString(s string) {
 		}
 
 		// translate VK_X to VK_NUMPADX
-		if vkc >= 0x30 && vkc <= 0x39 {
-			vkc += 0x30
-		}
+		// if vkc >= 0x30 && vkc <= 0x39 {
+		// 	vkc += 0x30
+		// }
 
 		vsc, _, _ := mapVirtualKeyExAProc.Call(vkc, uintptr(0))
 		inputDown := NewKeyboardInput(uint16(vkc), uint16(vsc), 0)
