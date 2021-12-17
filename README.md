@@ -14,7 +14,7 @@ A utility program (`show-serial-devices`) is shipped along to help identify the 
 
 ## Usage
 
-Once the program is properly configured, it should appear in the taskbar tray. If it isn't the case, please verify check the `logs.log` file and check your config.
+Once the program is properly configured, it should appear in the taskbar tray. If it isn't the case, check the `logs.log` file and check your config file.
 
 ## Why is this even needed
 
