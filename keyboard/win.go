@@ -2,6 +2,7 @@ package keyboard
 
 import (
 	"fmt"
+	"strings"
 	"syscall"
 	"unsafe"
 )
@@ -60,6 +61,8 @@ func NewKeyboardInput(wVk uint16, wScan uint16, dwFlags uint32) (kbinput INPUT) 
 
 // SendString converts string chars into virtual key codes and feeds them into SendInput system call
 func SendString(s string) {
+	s = strings.ReplaceAll(s, "\r\n", "\n")
+
 	// get keyboard layout for VkKeyScanExA
 	hkl, _, _ := getKeyboardLayoutProc.Call(uintptr(0))
 	// get caps lock state 0x14 is VK_CAPITAL
