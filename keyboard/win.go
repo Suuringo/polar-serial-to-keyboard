@@ -32,6 +32,23 @@ type KEYBDINPUT struct {
 	dwExtraInfo uint64
 }
 
+type inputBuilder struct {
+	inputs    []INPUT
+	capitalOn bool
+}
+
+func (ib *inputBuilder) append(i INPUT) {
+	ib.inputs = append(ib.inputs, i)
+}
+
+func (ib *inputBuilder) pressCapital() {
+	capsDown := NewKeyboardInput(_VK_CAPITAL, 0, 0)
+	capsUp := NewKeyboardInput(_VK_CAPITAL, 0, _KEYEVENTF_KEYUP)
+	ib.append(capsDown)
+	ib.append(capsUp)
+	ib.capitalOn = !ib.capitalOn
+}
+
 // NewKeyboardInput INPUT constructor
 func NewKeyboardInput(wVk uint16, wScan uint16, dwFlags uint32) (kbinput INPUT) {
 	kbinput.inputType = 1
@@ -43,25 +60,23 @@ func NewKeyboardInput(wVk uint16, wScan uint16, dwFlags uint32) (kbinput INPUT) 
 
 // SendString converts string chars into virtual key codes and feeds them into SendInput system call
 func SendString(s string) {
-	var inputs []INPUT
 	// get keyboard layout for VkKeyScanExA
 	hkl, _, _ := getKeyboardLayoutProc.Call(uintptr(0))
 	// get caps lock state 0x14 is VK_CAPITAL
 	state, _, _ := getKeyStateProc.Call(uintptr(_VK_CAPITAL))
 
-	if state&0x0001 == 0 {
-		// CapsLock is off
-		fmt.Println("CapsLock is off")
-		capsDown := NewKeyboardInput(_VK_CAPITAL, 0, 0)
-		capsUp := NewKeyboardInput(_VK_CAPITAL, 0, _KEYEVENTF_KEYUP)
-		inputs = append(inputs, capsDown)
-		inputs = append(inputs, capsUp)
-	}
+	var inputs inputBuilder
+	isCapsOn := state&0x0001 != 0
+	inputs.capitalOn = isCapsOn
 
 	for _, c := range s {
 		vkscan, _, _ := vkKeyScanExAProc.Call(uintptr(c), hkl)
 		var vkc = vkscan & 0xFF
-		// var shiftState int16 = int16((vkscan >> 8) & 0xFF)
+		var shiftState int16 = int16((vkscan >> 8) & 0xFF)
+
+		if shiftState == 1 && !inputs.capitalOn {
+			inputs.pressCapital()
+		}
 
 		// translate VK_X to VK_NUMPADX
 		if vkc >= 0x30 && vkc <= 0x39 {
@@ -72,22 +87,19 @@ func SendString(s string) {
 		inputDown := NewKeyboardInput(uint16(vkc), uint16(vsc), 0)
 		inputUp := NewKeyboardInput(uint16(vkc), uint16(vsc), _KEYEVENTF_KEYUP)
 
-		inputs = append(inputs, inputDown)
-		inputs = append(inputs, inputUp)
+		inputs.append(inputDown)
+		inputs.append(inputUp)
 	}
 
-	if state&0x0001 == 0 {
-		capsDown := NewKeyboardInput(_VK_CAPITAL, 0, 0)
-		capsUp := NewKeyboardInput(_VK_CAPITAL, 0, _KEYEVENTF_KEYUP)
-		inputs = append(inputs, capsDown)
-		inputs = append(inputs, capsUp)
+	if isCapsOn != inputs.capitalOn {
+		inputs.pressCapital()
 	}
 
 	var dummy INPUT
 
 	n, _, err := sendInputProc.Call(
-		uintptr(len(inputs)),
-		uintptr(unsafe.Pointer((*[1]INPUT)(inputs))), // get underlying array pointer from slice
+		uintptr(len(inputs.inputs)),
+		uintptr(unsafe.Pointer((*[1]INPUT)(inputs.inputs))), // get underlying array pointer from slice
 		uintptr(unsafe.Sizeof(dummy)))
 
 	fmt.Println(n, err, unsafe.Sizeof(dummy))
