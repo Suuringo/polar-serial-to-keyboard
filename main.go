@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
-	"polar/keyboard"
+	"polar-serial-to-usb/keyboard"
 	"strings"
 
 	"github.com/getlantern/systray"

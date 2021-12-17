@@ -1,4 +1,4 @@
-module polar
+module polar-serial-to-usb
 
 go 1.17
 
