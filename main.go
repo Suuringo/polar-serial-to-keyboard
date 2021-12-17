@@ -3,7 +3,6 @@ package main
 import (
 	_ "embed"
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 	"polar/keyboard"
@@ -23,19 +22,14 @@ type Config struct {
 var shigLove []byte
 
 func main() {
-	systray.Run(onReady, onExit)
-}
+	file, err := os.OpenFile("logs.log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+	log.SetOutput(file)
 
-func readConfig() (conf Config) {
-	buf, err := os.ReadFile("./config.json")
-	if err != nil {
-		log.Fatal("Error opening config.json ", err)
-	}
-	err = json.Unmarshal(buf, &conf)
-	if err != nil {
-		log.Fatal("Error parsing config.json ", err)
-	}
-	return
+	systray.Run(onReady, onExit)
 }
 
 func onReady() {
@@ -45,14 +39,10 @@ func onReady() {
 	mquit := systray.AddMenuItem("Quitter", "Quitter")
 	go func() {
 		<-mquit.ClickedCh
-		fmt.Println("Requesting quit")
 		systray.Quit()
-		os.Exit(1)
-		fmt.Println("Finished quitting")
 	}()
 
 	var portName string
-
 	conf := readConfig()
 	if conf.DeviceName != "" {
 		ports, err := enumerator.GetDetailedPortsList()
@@ -92,6 +82,19 @@ func onReady() {
 	listenString(port, LF, keyboard.SendString)
 }
 
+func readConfig() (conf Config) {
+	buf, err := os.ReadFile("./config.json")
+	if err != nil {
+		log.Fatal("Error opening config.json ", err)
+	}
+	err = json.Unmarshal(buf, &conf)
+	if err != nil {
+		log.Fatal("Error parsing config.json ", err)
+	}
+	return
+}
+
 func onExit() {
+	os.Exit(0)
 	return
 }
