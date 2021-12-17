@@ -4,7 +4,7 @@ Serial to Keyboard converter for Polar's card readers
 ## Configuration
 
 This program is intended to be run as a background process. 
-As such, it doesn't have any kind of user-face interface and has to use a configuration file to choose which port to connect to on runtime.
+As such, it doesn't have any kind of user-facing interface and has to use a configuration file to choose which port to connect to on runtime.
 
 Configuration is done through the `config.json` file with two possible fields : 
 - `port` : specifies which port to connect to;
@@ -18,4 +18,4 @@ Once the program is properly configured, it should appear in the taskbar tray. I
 
 ## Why is this even needed
 
-YSoft's card readers' integrated USB keyboard mode emulates key strokes on EN/US keyboard layout, which doesn't work with Polar's terminals, which are set to FR.
+YSoft's card readers' integrated USB keyboard mode emulates key strokes on EN/US keyboard layout, which doesn't work with Polar's terminals, which are set to the FR layout.
