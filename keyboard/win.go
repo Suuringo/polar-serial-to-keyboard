@@ -13,7 +13,6 @@ var (
 	getKeyboardLayoutProc = user32.NewProc("GetKeyboardLayout")
 	mapVirtualKeyExAProc  = user32.NewProc("MapVirtualKeyExA")
 	getKeyStateProc       = user32.NewProc("GetKeyState")
-	keydbProc             = user32.NewProc("keybd_event")
 	sendInputProc         = user32.NewProc("SendInput")
 )
 
