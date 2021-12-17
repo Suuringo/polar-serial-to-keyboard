@@ -79,6 +79,8 @@ func onReady() {
 
 	log.Println("Opened port", portName)
 
+	systray.SetTooltip("Connected to port " + portName + ". Ui-beamu!!")
+
 	listenString(port, LF, keyboard.SendString)
 }
 
